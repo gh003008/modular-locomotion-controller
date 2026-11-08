@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modular Locomotion Controller</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a single reading column like a lab project page; each brain module gets a colored rail and its video. */
+:root {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --ink: #16202e;
+  --muted: #566274;
+  --line: #dde3ec;
+  --accent: #004191;
+  --mc: #2a74d6;
+  --cb: #e2642a;
+  --bs: #12a079;
+  --bg-mod: #b07a0b;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f141c; --surface: #18202b; --ink: #e8edf4; --muted: #9aa7b8; --line: #2a3442;
+    --accent: #7fb2ff; --mc: #6aa5ff; --cb: #ff8f5c; --bs: #3fd0a6; --bg-mod: #e2b04a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f141c; --surface: #18202b; --ink: #e8edf4; --muted: #9aa7b8; --line: #2a3442;
+  --accent: #7fb2ff; --mc: #6aa5ff; --cb: #ff8f5c; --bs: #3fd0a6; --bg-mod: #e2b04a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.6 var(--body); }
+main { max-width: 860px; margin: 0 auto; padding: 40px 20px 64px; display: grid; gap: 36px; }
+header { display: grid; gap: 12px; }
+.event { font: 600 13px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 700 clamp(28px, 5vw, 40px)/1.15 var(--display); margin: 0; text-wrap: balance; }
+.authors { color: var(--muted); margin: 0; }
+.authors strong { color: var(--ink); font-weight: 500; }
+.lead { margin: 0; max-width: 65ch; }
+.lead b { color: var(--accent); font-weight: 600; }
+.modules { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 600 15px/1 var(--body); }
+.chip { padding: 8px 12px; border-radius: 6px; border: 1.5px solid currentColor; background: var(--surface); }
+.chip span { font-weight: 400; color: var(--muted); }
+.arrow { color: var(--muted); }
+.c-mc { color: var(--mc); } .c-cb { color: var(--cb); } .c-bs { color: var(--bs); } .c-bg { color: var(--bg-mod); }
+h2 { font: 700 24px/1.2 var(--display); margin: 0; text-wrap: balance; }
+.videos { display: grid; gap: 28px; }
+article { background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--rail); border-radius: 8px; padding: 18px 18px 20px; display: grid; gap: 12px; }
+article h3 { margin: 0; font: 700 21px/1.25 var(--display); color: var(--rail); }
+article p { margin: 0; max-width: 65ch; }
+article ol { margin: 0; padding-left: 22px; color: var(--muted); }
+video { width: 100%; height: auto; border-radius: 6px; background: #000; display: block; aspect-ratio: 4 / 3; }
+footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 4px; }
+a { color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="event">Poster · NVIDIA GTC 2027</div>
+    <h1>A Neurophysiology-Informed Modular Controller for Human Locomotion, Checked Against Human Data</h1>
+    <p class="authors"><strong>Gunhee Lee, Jaeyong Cho, Jinsu Park, Hyojun An, Jimin Youn, Jinyong Jung, Kyoungchul Kong, and Jung Kim</strong><br>EXO Lab, Dept. of Mechanical Engineering, KAIST · Human-Physical AI Research Center</p>
+    <p class="lead">Wearable robots are trained in simulation, so the simulated wearer must react like a person. We split the walking controller into modules that follow brain regions. <b>Each module does its own job</b>, and changing one module gives a patient-like gait.</p>
+    <div class="modules" aria-label="Controller modules">
+      <span class="chip c-mc">MC <span>motor cortex · intent</span></span>
+      <span class="arrow">→</span>
+      <span class="chip c-cb">CB <span>cerebellum · prediction</span></span>
+      <span class="chip c-bs">BS <span>brainstem · balance</span></span>
+      <span class="chip c-bg">BG <span>basal ganglia · vigor</span></span>
+      <span class="arrow">→</span>
+      <span class="chip" style="color:var(--ink)">Body</span>
+    </div>
+  </header>
+
+  <section class="videos" aria-labelledby="v-title">
+    <h2 id="v-title">Videos: each module at work</h2>
+
+    <article style="--rail: var(--mc)">
+      <h3>MC · Motor cortex plans the walking motion</h3>
+      <p>MC alone produces the stepping pattern. Held up by the pelvis, it steps freely; on the ground, without the posture and correction modules, it cannot keep a stable walk.</p>
+      <video controls muted playsinline preload="metadata" src="videos/06_MC_Combined_01_02.mp4"></video>
+      <ol><li>Pelvis suspended in the air (0–10 s)</li><li>On the ground (10–25 s)</li></ol>
+    </article>
+
+    <article style="--rail: var(--cb)">
+      <h3>CB · Cerebellum corrects the gap between plan and body</h3>
+      <p>The plots show MC's planned joint angles, the actual angles, and the gap between them. The video compares the cerebellum's corrector at full output with the same corrector scaled down to 70 %.</p>
+      <video controls muted playsinline preload="metadata" src="videos/07_CB_Combined_03_04.mp4"></video>
+      <ol><li>Corrector applied (0–12 s)</li><li>Corrector output scaled to 70 % (12–24 s)</li></ol>
+    </article>
+
+    <article style="--rail: var(--bs)">
+      <h3>BS · Brainstem recovers balance after a trip</h3>
+      <p>The foot catches a 6 cm obstacle. The plots compare walking with and without BS: its correction switches on at the trip, and pelvis tilt and walking speed return toward normal.</p>
+      <video controls muted playsinline preload="metadata" src="videos/05_BS_With_disturbance.mp4"></video>
+    </article>
+  </section>
+
+  <footer>
+    <span>Simulation in Isaac Lab with a full-body human model. Human comparison data: Van Criekinge et al., Sci Data 2023.</span>
+    <span>EXO Lab, KAIST</span>
+  </footer>
+</main>
+</body>
+</html>
